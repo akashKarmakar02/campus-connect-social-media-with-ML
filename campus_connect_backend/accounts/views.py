@@ -18,11 +18,10 @@ class RegisterAPI(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request: Request):
-        serializer = UserSerializer(data=request.data)
+        serializer = UserSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             user = serializer.save()
             data = serializer.data
-            data['download_url'] = user.profile_image.url  # Add this line
             return Response(data)
         return Response("Some Error Occurred", status=status.HTTP_400_BAD_REQUEST)
 
@@ -54,21 +53,20 @@ class LoginAPI(APIView):
             secure=True,
         )
 
-        response.data = {
-            'jwt': token
-        }
+        data = UserSerializer(user, context={ 'request': request }).data
+        data['jwt'] = token
+        data['exp'] = datetime.datetime.utcnow() + datetime.timedelta(days=7)
+
+        response.data = data
 
         return response
 
 
 class ProfileImageDownloadAPIView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def get(self, request: Request, user_id):
         try:
             user = User.objects.get(id=user_id)
-            if user.id != request.user.id:
-                raise PermissionDenied('You are not authorized to get this resource')
             if user.profile_image:
                 file_path = user.profile_image.path
                 with open(file_path, 'rb') as file:
