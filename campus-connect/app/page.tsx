@@ -1,4 +1,4 @@
-import PostCard from "@/components/PostCard";
+import PostingCard from "@/components/PostingCard";
 import { getServerSession } from "next-auth";
 import { options } from "./api/auth/[...nextauth]/options";
 
@@ -12,7 +12,7 @@ async function page() {
   const data: Post[] = await response.json();
   console.log(data);
 
-  return <div>{session ? <PostCard session={session} /> : <div></div>}</div>;
+  return <div>{session ? <PostingCard session={session} /> : <div></div>}</div>;
 }
 
 export default page;
