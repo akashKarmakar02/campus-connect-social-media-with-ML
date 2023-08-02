@@ -8,11 +8,3 @@ services:
     container_name: django-campus-connect-backend
     ports:
       - "8000:8000"
-
-  nuxt-frontend:
-    build: ./campus-connect
-    command: npm run dev
-    image: next-campus-connect-frontend
-    container_name: next-campus-connect-frontend
-    ports:
-      - "3000:3000"
